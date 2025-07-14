@@ -6,6 +6,14 @@ import { EventController } from './controllers/EventController.js';
 // Utilitário para detectar a página atual
 const currentPage = window.location.pathname;
 
+
+document.addEventListener('DOMContentLoaded', () => {
+  ProjectController.init();
+});
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   if (currentPage.includes('login.html')) {
     initAuth();
