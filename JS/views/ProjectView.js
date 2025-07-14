@@ -1,27 +1,22 @@
-export const ProjectView = {
-  renderProjects(projects) {
-    const container = document.getElementById('project-list');
-    container.innerHTML = '';
+import { ProjectModel } from '../models/ProjectModel.js';
+import { ProjectView } from '../views/ProjectView.js';
 
-    if (projects.length === 0) {
-      container.innerHTML = '<p>Nenhum projeto encontrado.</p>';
-      return;
-    }
+export class ProjectController {
+  static async init() {
+    const projetos = await ProjectModel.getAll();
+    ProjectView.renderProjects(projetos);
 
-    projects.forEach(project => {
-      const card = document.createElement('div');
-      card.className = 'project-card';
-      card.innerHTML = `
-        <h3>${project.title}</h3>
-        <p>${project.description}</p>
-        <p><strong>Prazo:</strong> ${project.deadline}</p>
-        <p><strong>Prioridade:</strong> ${project.priority}</p>
-      `;
-      container.appendChild(card);
+    ProjectView.onFormSubmit(async (data) => {
+      await ProjectModel.create(data);
+      const atualizados = await ProjectModel.getAll();
+      ProjectView.renderProjects(atualizados);
+      ProjectView.clearForm();
     });
-  },
 
-  showCreateSuccess() {
-    alert("Projeto criado com sucesso!");
+    ProjectView.onDeleteClick(async (id) => {
+      await ProjectModel.delete(id);
+      const atualizados = await ProjectModel.getAll();
+      ProjectView.renderProjects(atualizados);
+    });
   }
-};
+}
