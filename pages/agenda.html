@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -6,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Variáveis de Cores */
     :root {
       --bg-main: #f5f7fa;
       --bg-card: #ffffff;
@@ -17,6 +19,7 @@
       --highlight: #ff70a6;
     }
 
+    /* Modo Escuro */
     .dark-mode {
       --bg-main: #1a1b1e;
       --bg-card: #2c2f36;
@@ -28,6 +31,7 @@
       --highlight: #ffd700;
     }
 
+    /* Estilos Globais */
     * {
       margin: 0;
       padding: 0;
@@ -43,6 +47,7 @@
       transition: background 0.3s, color 0.3s;
     }
 
+    /* Sidebar */
     .sidebar {
       width: 240px;
       background-color: var(--sidebar-bg);
@@ -76,6 +81,7 @@
       margin-right: 10px;
     }
 
+    /* Conteúdo Principal */
     .main {
       flex: 1;
       padding: 30px;
@@ -97,6 +103,7 @@
       color: var(--text-main);
     }
 
+    /* Calendário */
     .calendar-nav {
       display: flex;
       align-items: center;
@@ -119,6 +126,14 @@
       gap: 10px;
       max-width: 800px;
       margin: auto;
+    }
+
+    .days-of-week-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        max-width: 800px;
+        margin: 0 auto 10px;
     }
 
     .day, .empty {
@@ -150,8 +165,10 @@
     .days-of-week {
       font-weight: bold;
       text-align: center;
+      color: var(--text-muted);
     }
 
+    /* Botão Flutuante */
     #addEventBtn {
       position: fixed;
       bottom: 30px;
@@ -167,6 +184,7 @@
       z-index: 5;
     }
 
+    /* Modal */
     .modal {
       position: fixed;
       top: 50%;
@@ -183,7 +201,7 @@
       width: 400px;
     }
 
-    .modal input {
+    .modal input, .modal textarea {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -208,14 +226,13 @@
       cursor: pointer;
     }
 
-    .modal-buttons button:nth-child(1) { background-color: #28a745; color: white; }
-    .modal-buttons button:nth-child(2) { background-color: #dc3545; color: white; }
-    .modal-buttons button:nth-child(3) { background-color: #6c757d; color: white; }
+    .modal-buttons button:nth-child(1) { background-color: #28a745; color: white; } /* Salvar */
+    .modal-buttons button:nth-child(2) { background-color: #dc3545; color: white; } /* Excluir */
+    .modal-buttons button:nth-child(3) { background-color: #6c757d; color: white; } /* Cancelar */
 
 </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div>
       <h2>Gestão</h2>
@@ -228,21 +245,37 @@
     <div>
       <a href="#" class="menu-item"><i class='bx bx-log-out'></i> Sair</a>
     </div>
-  </aside>  <!-- Conteúdo principal -->  <main class="main">
+  </aside>
+
+  <main class="main">
     <div class="main-header">
       <h1>Agenda</h1>
       <button class="theme-toggle" id="themeToggle"><i class='bx bx-moon' id="themeIcon"></i></button>
-    </div><div class="calendar-nav">
-  <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-  <h2 id="monthYear"></h2>
-  <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
-</div>
+    </div>
 
-<div class="calendar" id="calendar"></div>
+    <div class="calendar-nav">
+      <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+      <h2 id="monthYear"></h2>
+      <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
 
-  </main>  <!-- Botão flutuante --><button id="addEventBtn">+</button>
+    <div class="days-of-week-header">
+        <div class="days-of-week">Dom</div>
+        <div class="days-of-week">Seg</div>
+        <div class="days-of-week">Ter</div>
+        <div class="days-of-week">Qua</div>
+        <div class="days-of-week">Qui</div>
+        <div class="days-of-week">Sex</div>
+        <div class="days-of-week">Sáb</div>
+    </div>
 
-  <!-- Modal de evento -->  <div class="modal" id="eventModal">
+    <div class="calendar" id="calendar"></div>
+
+  </main>
+
+  <button id="addEventBtn">+</button>
+
+  <div class="modal" id="eventModal">
     <h3>Adicionar/Editar Evento</h3>
     <input type="text" id="eventTitle" placeholder="Título do evento" />
     <input type="date" id="eventDate" />
@@ -252,7 +285,8 @@
       <button onclick="deleteEvent()">Excluir</button>
       <button onclick="closeModal()">Cancelar</button>
     </div>
-  </div>  
+  </div>
+
   <script type="module" src="../JS/main.js"></script>
-  </body>
-</html>
+</body>
+          </html>
