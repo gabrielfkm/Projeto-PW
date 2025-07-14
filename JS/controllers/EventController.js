@@ -1,5 +1,12 @@
 import { EventModel } from '../models/EventModel.js';
 
+EventView.renderCalendar({
+  events: this.events,
+  currentDate: this.currentDate,
+  onDayClick: this.showEventModal.bind(this)
+});
+
+
 export const EventController = {
   events: [],
 
