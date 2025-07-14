@@ -1,79 +1,125 @@
 import { EventModel } from '../models/EventModel.js';
 import { EventView } from '../views/EventView.js';
 
+// Corrigido: mantendo a data global
+let currentDate = new Date();
+
 export const EventController = {
   events: [],
-  currentDate: new Date(),
 
   async init() {
     this.events = await EventModel.getAll();
     this.renderCalendar();
-    this.setupMonthNavigation();
+    this.setupNavigation();
   },
 
   renderCalendar() {
-    EventView.renderCalendar({
-      events: this.events,
-      currentDate: this.currentDate,
-      onDayClick: this.showEventModal.bind(this)
+    const calendarEl = document.getElementById('calendar');
+    const monthYearEl = document.getElementById('monthYear');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+      'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+    calendarEl.innerHTML = '';
+
+    // Cabeçalho dos dias da semana
+    daysOfWeek.forEach(day => {
+      const dayEl = document.createElement("div");
+      dayEl.textContent = day;
+      dayEl.classList.add("days-of-week");
+      calendarEl.appendChild(dayEl);
+    });
+
+    // Dias vazios antes do primeiro dia do mês
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      empty.classList.add("empty");
+      calendarEl.appendChild(empty);
+    }
+
+    // Dias do mês
+    for (let day = 1; day <= lastDate; day++) {
+      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const dayEl = document.createElement("div");
+      dayEl.classList.add("day");
+      dayEl.textContent = day;
+
+      const eventsForDay = this.events.filter(e => e.date === dateKey);
+
+      if (eventsForDay.length > 0) {
+        eventsForDay.forEach(ev => {
+          const evEl = document.createElement("div");
+          evEl.className = "event";
+          evEl.textContent = ev.title;
+          dayEl.appendChild(evEl);
+        });
+
+        dayEl.classList.add(eventsForDay.some(ev => ev.title.toLowerCase().includes("prazo") || ev.title.toLowerCase().includes("fim")) ? "orange" : "highlight");
+        dayEl.onclick = () => this.showEventModal(dateKey, eventsForDay);
+      } else {
+        dayEl.onclick = () => this.showEventModal(dateKey, []);
+      }
+
+      calendarEl.appendChild(dayEl);
+    }
+
+    monthYearEl.textContent = `${monthNames[month]} ${year}`;
+  },
+
+  setupNavigation() {
+    document.querySelector(".calendar-nav button:nth-child(1)").addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      this.renderCalendar();
+    });
+
+    document.querySelector(".calendar-nav button:nth-child(3)").addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      this.renderCalendar();
     });
   },
 
-  showEventModal(date, eventsForDay) {
-    const modal = document.getElementById('eventModal');
-    const titleInput = document.getElementById('eventTitle');
-    const dateInput = document.getElementById('eventDate');
-    const descInput = document.getElementById('eventDescription');
+  showEventModal(dateKey, eventsForDay) {
+    const modal = document.getElementById("eventModal");
+    const eventTitle = document.getElementById("eventTitle");
+    const eventDate = document.getElementById("eventDate");
+    const eventDescription = document.getElementById("eventDescription");
 
-    titleInput.value = '';
-    dateInput.value = date;
-    descInput.value = '';
-    modal.style.display = 'block';
+    // Preparar formulário
+    modal.style.display = "block";
+    eventDate.value = dateKey;
+    eventTitle.value = "";
+    eventDescription.value = "";
 
-    // Botão Salvar
     window.saveEdit = async () => {
-      const newEvent = {
-        title: titleInput.value.trim(),
-        date: dateInput.value,
-        description: descInput.value.trim()
-      };
+      const title = eventTitle.value.trim();
+      const description = eventDescription.value.trim();
 
-      if (!newEvent.title || !newEvent.date || !newEvent.description) {
-        alert('Preencha todos os campos!');
+      if (!title || !description) {
+        alert("Preencha todos os campos!");
         return;
       }
 
+      const newEvent = { title, description, date: dateKey };
       await EventModel.create(newEvent);
       this.events = await EventModel.getAll();
-      modal.style.display = 'none';
+      modal.style.display = "none";
       this.renderCalendar();
     };
 
-    // Botão Excluir
     window.deleteEvent = async () => {
       if (eventsForDay.length === 0) return;
-      const confirmDelete = confirm('Deseja realmente excluir o evento?');
-      if (confirmDelete) {
+      if (confirm("Deseja excluir o evento?")) {
         await EventModel.delete(eventsForDay[0].id);
         this.events = await EventModel.getAll();
-        modal.style.display = 'none';
+        modal.style.display = "none";
         this.renderCalendar();
       }
     };
 
-    window.closeModal = () => {
-      modal.style.display = 'none';
-    };
-  },
-
-  setupMonthNavigation() {
-    document.querySelectorAll('.calendar-nav button')[0].onclick = () => {
-      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-      this.renderCalendar();
-    };
-    document.querySelectorAll('.calendar-nav button')[1].onclick = () => {
-      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-      this.renderCalendar();
-    };
+    window.closeModal = () => modal.style.display = "none";
   }
 };
