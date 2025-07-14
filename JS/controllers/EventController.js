@@ -1,101 +1,44 @@
 import { EventModel } from '../models/EventModel.js';
-
-EventView.renderCalendar({
-  events: this.events,
-  currentDate: this.currentDate,
-  onDayClick: this.showEventModal.bind(this)
-});
-
+import { EventView } from '../views/EventView.js';
 
 export const EventController = {
   events: [],
+  currentDate: new Date(),
 
   async init() {
     this.events = await EventModel.getAll();
     this.renderCalendar();
+    this.setupMonthNavigation();
   },
 
-  async renderCalendar() {
-    const calendarEl = document.getElementById('calendar');
-    const monthYearEl = document.getElementById('monthYear');
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month + 1, 0).getDate();
-    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
-                        'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-    calendarEl.innerHTML = '';
-
-    daysOfWeek.forEach(d => {
-      const dayEl = document.createElement("div");
-      dayEl.textContent = d;
-      dayEl.classList.add("days-of-week");
-      calendarEl.appendChild(dayEl);
+  renderCalendar() {
+    EventView.renderCalendar({
+      events: this.events,
+      currentDate: this.currentDate,
+      onDayClick: this.showEventModal.bind(this)
     });
-
-    for (let i = 0; i < firstDay; i++) {
-      const empty = document.createElement("div");
-      empty.classList.add("empty");
-      calendarEl.appendChild(empty);
-    }
-
-    for (let day = 1; day <= lastDate; day++) {
-      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayEl = document.createElement("div");
-      dayEl.classList.add("day");
-      dayEl.textContent = day;
-
-      const dayEvents = this.events.filter(ev => ev.date === dateKey);
-      if (dayEvents.length > 0) {
-        dayEvents.forEach(ev => {
-          const evEl = document.createElement("div");
-          evEl.className = "event";
-          evEl.textContent = ev.title;
-          dayEl.appendChild(evEl);
-        });
-
-        if (dayEvents.some(ev => ev.title.toLowerCase().includes("prazo") || ev.title.toLowerCase().includes("fim"))) {
-          dayEl.classList.add("orange");
-        } else {
-          dayEl.classList.add("highlight");
-        }
-
-        dayEl.onclick = () => this.showEventModal(dateKey, dayEvents);
-      } else {
-        dayEl.onclick = () => this.showEventModal(dateKey, []);
-      }
-
-      calendarEl.appendChild(dayEl);
-    }
-
-    monthYearEl.textContent = `${monthNames[month]} ${year}`;
   },
 
   showEventModal(date, eventsForDay) {
     const modal = document.getElementById('eventModal');
-    const eventTitle = document.getElementById('eventTitle');
-    const eventDate = document.getElementById('eventDate');
-    const eventDescription = document.getElementById('eventDescription');
+    const titleInput = document.getElementById('eventTitle');
+    const dateInput = document.getElementById('eventDate');
+    const descInput = document.getElementById('eventDescription');
 
-    // Limpar modal
-    eventTitle.value = '';
-    eventDate.value = date;
-    eventDescription.value = '';
-
+    titleInput.value = '';
+    dateInput.value = date;
+    descInput.value = '';
     modal.style.display = 'block';
 
-    // Permitir salvar evento
+    // Botão Salvar
     window.saveEdit = async () => {
       const newEvent = {
-        title: eventTitle.value.trim(),
-        description: eventDescription.value.trim(),
-        date: eventDate.value
+        title: titleInput.value.trim(),
+        date: dateInput.value,
+        description: descInput.value.trim()
       };
 
-      if (!newEvent.title || !newEvent.description) {
+      if (!newEvent.title || !newEvent.date || !newEvent.description) {
         alert('Preencha todos os campos!');
         return;
       }
@@ -106,11 +49,11 @@ export const EventController = {
       this.renderCalendar();
     };
 
-    // Permitir excluir o primeiro evento do dia (ou pode ser modificado para vários)
+    // Botão Excluir
     window.deleteEvent = async () => {
       if (eventsForDay.length === 0) return;
-      const confirmed = confirm('Deseja excluir este evento?');
-      if (confirmed) {
+      const confirmDelete = confirm('Deseja realmente excluir o evento?');
+      if (confirmDelete) {
         await EventModel.delete(eventsForDay[0].id);
         this.events = await EventModel.getAll();
         modal.style.display = 'none';
@@ -120,6 +63,17 @@ export const EventController = {
 
     window.closeModal = () => {
       modal.style.display = 'none';
+    };
+  },
+
+  setupMonthNavigation() {
+    document.querySelectorAll('.calendar-nav button')[0].onclick = () => {
+      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+      this.renderCalendar();
+    };
+    document.querySelectorAll('.calendar-nav button')[1].onclick = () => {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      this.renderCalendar();
     };
   }
 };
