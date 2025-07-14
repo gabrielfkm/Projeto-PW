@@ -23,8 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (currentPage.includes('calendario.html')) {
+  if (currentPage.includes('agenda.html')) {
     EventController.init();
+  }
   }
 });
 
@@ -53,6 +54,3 @@ function initAuth() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  EventController.init();
-});
