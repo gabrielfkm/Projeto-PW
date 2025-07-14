@@ -52,3 +52,7 @@ function initAuth() {
     });
   }
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  EventController.init();
+});
