@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (currentPage.includes('agenda.html')) {
     EventController.init();
   }
-  }
 });
 
 // Lida com o envio dos formulários de login e cadastro
