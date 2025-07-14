@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda - Gestão de Projetos</title>
+  <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* estilos mantidos conforme fornecido */
+    /* ... (mantido o CSS original) ... */
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <h2>Gestão</h2>
+      <a href="index.html" class="menu-item"><i class='bx bx-grid-alt'></i> Dashboard</a>
+      <a href="projeto.html" class="menu-item"><i class='bx bx-folder'></i> Projetos</a>
+      <a href="agenda.html" class="menu-item active"><i class='bx bx-calendar'></i> Agenda</a>
+      <a href="chat.html" class="menu-item"><i class='bx bx-group'></i> Mensagens</a>
+      <a href="configuracoes.html" class="menu-item"><i class='bx bx-cog'></i> Configurações</a>
+    </div>
+    <div>
+      <a href="#" class="menu-item"><i class='bx bx-log-out'></i> Sair</a>
+    </div>
+  </aside>  <!-- Conteúdo principal -->  <main class="main">
+    <div class="main-header">
+      <h1>Agenda</h1>
+      <button class="theme-toggle" id="themeToggle"><i class='bx bx-moon' id="themeIcon"></i></button>
+    </div><div class="calendar-nav">
+  <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+  <h2 id="monthYear"></h2>
+  <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+  </main>  <!-- Botão flutuante --><button id="addEventBtn">+</button>
+
+  <!-- Modal de evento -->  <div class="modal" id="eventModal">
+    <h3>Adicionar/Editar Evento</h3>
+    <input type="text" id="eventTitle" placeholder="Título do evento" />
+    <input type="date" id="eventDate" />
+    <textarea id="eventDescription" placeholder="Descrição" rows="4"></textarea>
+    <div class="modal-buttons">
+      <button onclick="saveEdit()">Salvar</button>
+      <button onclick="deleteEvent()">Excluir</button>
+      <button onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>  
+  
+</body>
+</html>
