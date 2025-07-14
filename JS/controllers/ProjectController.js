@@ -1,20 +1,22 @@
 import { ProjectModel } from '../models/ProjectModel.js';
 import { ProjectView } from '../views/ProjectView.js';
 
-export const ProjectController = {
-  async init() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return window.location.href = '../pages/login.html';
+export class ProjectController {
+  static async init() {
+    const projetos = await ProjectModel.getAll();
+    ProjectView.renderProjects(projetos);
 
-    const projects = await ProjectModel.getByUserId(user.id);
-    ProjectView.renderProjects(projects);
-  },
+    ProjectView.onFormSubmit(async (data) => {
+      await ProjectModel.create(data);
+      const atualizados = await ProjectModel.getAll();
+      ProjectView.renderProjects(atualizados);
+      ProjectView.clearForm();
+    });
 
-  async create(formData) {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const newProject = { ...formData, userId: user.id };
-    await ProjectModel.create(newProject);
-    ProjectView.showCreateSuccess();
-    this.init(); // Recarrega lista
+    ProjectView.onDeleteClick(async (id) => {
+      await ProjectModel.delete(id);
+      const atualizados = await ProjectModel.getAll();
+      ProjectView.renderProjects(atualizados);
+    });
   }
-};
+}
