@@ -1,16 +1,33 @@
-import { ProjectService } from '../services/projectService.js';
+const API_URL = 'https://6873e2e0c75558e273558c87.mockapi.io/projeto/user/projetos';
 
-export const ProjectModel = {
-  async getAll() {
-    return await ProjectService.getAll();
-  },
-
-  async getByUserId(userId) {
-    const all = await ProjectService.getAll();
-    return all.filter(p => p.userId === userId);
-  },
-
-  async create(project) {
-    return await ProjectService.create(project);
+export class ProjectModel {
+  static async getAll() {
+    const res = await fetch(API_URL);
+    return res.json();
   }
-};
+
+  static async create(projectData) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(projectData)
+    });
+    return res.json();
+  }
+
+  static async delete(id) {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'DELETE'
+    });
+    return res.json();
+  }
+
+  static async update(id, updatedData) {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+    return res.json();
+  }
+}
